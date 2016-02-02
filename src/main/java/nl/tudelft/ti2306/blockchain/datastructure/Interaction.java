@@ -1,6 +1,5 @@
 package nl.tudelft.ti2306.blockchain.datastructure;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -72,24 +71,14 @@ public class Interaction {
      * @return the parents
      */
     public List<Interaction> getParents() {
-        ArrayList<Interaction> res = new ArrayList<>(2);
-        if (parent[0] != null)
-            res.add(parent[0]);
-        if (parent[1] != null)
-            res.add(parent[1]);
-        return res;
+        return Arrays.asList(parent);
     }
 
     /**
      * @return the children
      */
     public List<Interaction> getChildren() {
-        ArrayList<Interaction> res = new ArrayList<>(2);
-        if (child[0] != null)
-            res.add(child[0]);
-        if (child[1] != null)
-            res.add(child[1]);
-        return res;
+        return Arrays.asList(child);
     }
 
     /**
