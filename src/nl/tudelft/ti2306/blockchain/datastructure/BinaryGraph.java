@@ -1,7 +1,6 @@
 package nl.tudelft.ti2306.blockchain.datastructure;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -13,7 +12,6 @@ import java.util.List;
  */
 public class BinaryGraph<T> {
 
-    protected Collection<Node<T>> nodes;
     protected Node<T> root;
 
     /**
@@ -22,8 +20,6 @@ public class BinaryGraph<T> {
      */
     public BinaryGraph(T rootData) {
         root = new Node<>(rootData);
-        nodes = new ArrayList<>();
-        nodes.add(root);
     }
 
     /**
@@ -52,8 +48,18 @@ public class BinaryGraph<T> {
          * Construct a new node.
          * @param data the data in this node.
          */
-        public Node(T data) {
+        protected Node(T data) {
             this.data = data;
+        }
+
+        /**
+         * Adds a parent to this node, if possible.
+         * @param parent The parent to add to this node.
+         * @return true if the parent was added, false if there can be no more
+         * parents.
+         */
+        public boolean addParent(T childData) {
+            return addParent(new Node<T>(childData));
         }
 
         /**
@@ -67,32 +73,77 @@ public class BinaryGraph<T> {
         }
 
         /**
+         * Adds a parent to this node, if possible.
+         * @param parent The parent to add to this node.
+         * @return true if the parent was added, false else.
+         */
+        public boolean addParent(Node<T> parent) {
+            if (this.addParentIntern(parent)) {
+                if (parent.addChildIntern(this)) {
+                    return true;
+                } else {
+                    parent.removeParentIntern(this);
+                }
+            }
+            return false;
+        }
+
+        /**
          * Adds a child to this node, if possible.
          * @param child The child to add to this node.
          * @return true if the child was added, false else.
          */
         public boolean addChild(Node<T> child) {
+            if (child.addParentIntern(this)) {
+                if (this.addChildIntern(child)) {
+                    return true;
+                } else {
+                    child.removeParentIntern(this);
+                }
+            }
+            return false;
+        }
+
+        protected boolean removeParentIntern(Node<T> node) {
+            if (parentLeft.equals(node)) {
+                parentLeft = null;
+            } else if (parentRight.equals(node)) {
+                parentRight = null;
+            } else return false;
+            return true;
+        }
+
+        protected boolean removeChildIntern(Node<T> node) {
+            if (childLeft.equals(node)) {
+                childLeft = null;
+            } else if (childRight.equals(node)) {
+                childRight = null;
+            } else return false;
+            return true;
+        }
+
+        /**
+         * Adds a child to this node, if possible.
+         * @param child the child to add to this node.
+         * @return true if the child was added, false else.
+         */
+        protected boolean addChildIntern(Node<T> child) {
             if (childLeft == null) {
-                if (child.addParent(this))
-                    childLeft = child;
-                else return false;
+                childLeft = child;
             }
             else if (childRight == null) {
-                if (child.addParent(this))
-                    childRight = child;
-                else return false;
+                childRight = child;
             }
             else return false;
             return true;
         }
 
         /**
-         * Used when adding a child, makes sure that there also is a parent
-         * connection.
+         * Adds a parent to this node, if possible.
          * @param parent the parent to add to this node.
          * @return true if the parent was added, false else.
          */
-        protected boolean addParent(Node<T> parent) {
+        protected boolean addParentIntern(Node<T> parent) {
             if (parentLeft == null) {
                 parentLeft = parent;
             }
