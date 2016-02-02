@@ -18,15 +18,15 @@ public class BinaryGraphTest {
         Node<String> root = g.getRoot();
         assertEquals("RootNode", root.getData());
 
-        assertTrue(root.addChild("Child1"));
-        assertTrue(root.addChild("Child2"));
-        assertFalse(root.addChild("Child3"));
+        assertNotNull(root.addChild("Child1"));
+        assertNotNull(root.addChild("Child2"));
+        assertNull(root.addChild("Child3"));
         
         Node<String> n1 = root.getChildren().get(0);
         assertEquals(root, n1.getParents().get(0));
 
-        assertTrue(n1.addParent("Parent1"));
-        assertFalse(n1.addParent("Parent2"));
+        assertNotNull(n1.addParent("Parent1"));
+        assertNull(n1.addParent("Parent2"));
         
         Node<String> p1 = n1.getParents().get(1);
         assertEquals(n1, p1.getChildren().get(0));

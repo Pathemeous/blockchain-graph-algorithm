@@ -1,6 +1,7 @@
 package nl.tudelft.ti2306.blockchain.datastructure;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -13,6 +14,7 @@ import java.util.List;
 public class BinaryGraph<T> {
 
     protected Node<T> root;
+    protected List<Node<T>> nodes;
 
     /**
      * Constructs a new BinaryGraph with a root.
@@ -20,6 +22,9 @@ public class BinaryGraph<T> {
      */
     public BinaryGraph(T rootData) {
         root = new Node<>(rootData);
+        root.graph = this;
+        nodes = new ArrayList<>();
+        nodes.add(root);
     }
 
     /**
@@ -27,6 +32,10 @@ public class BinaryGraph<T> {
      */
     public Node<T> getRoot() {
         return root;
+    }
+    
+    public List<Node<T>> getNodes() {
+        return Collections.unmodifiableList(nodes);
     }
 
 
@@ -38,6 +47,7 @@ public class BinaryGraph<T> {
      */
     public static class Node<T> {
 
+        protected BinaryGraph<T> graph;
         protected T data;
         protected Node<T> parentLeft;
         protected Node<T> parentRight;
@@ -58,8 +68,13 @@ public class BinaryGraph<T> {
          * @return true if the parent was added, false if there can be no more
          * parents.
          */
-        public boolean addParent(T childData) {
-            return addParent(new Node<T>(childData));
+        public Node<T> addParent(T parentData) {
+            Node<T> n = new Node<T>(parentData);
+            if (addParent(n)) {
+                n.graph = graph;
+                graph.nodes.add(n);
+                return n;
+            } else return null;
         }
 
         /**
@@ -68,8 +83,13 @@ public class BinaryGraph<T> {
          * @return true if the child was added, false if there can be no more
          * children.
          */
-        public boolean addChild(T childData) {
-            return addChild(new Node<T>(childData));
+        public Node<T> addChild(T childData) {
+            Node<T> n = new Node<T>(childData);
+            if (addChild(n)) {
+                n.graph = graph;
+                graph.nodes.add(n);
+                return n;
+            } else return null;
         }
 
         /**
