@@ -1,29 +1,15 @@
-package nl.tudelft.ti2306.blockchain.datastructure;
+package nl.tudelft.ti2306.blockchain;
 
-import java.util.Collections;
 import java.util.Random;
 
-import nl.tudelft.ti2306.blockchain.InteractionGraphToViz;
+import nl.tudelft.ti2306.blockchain.datastructure.InteractionGraph;
 
 /**
  * Created by justin on 02/02/16.
  */
 public class InteractionGraphGenerator {
-
-    public static void main(String ... args) {
-
-        final int peerCnt;
-        final int interactionCnt;
-
-        switch (args.length) {
-            case 2:
-                peerCnt        = Integer.valueOf(args[0]);
-                interactionCnt = Integer.valueOf(args[1]);
-                break;
-            default:
-                peerCnt = 5;
-                interactionCnt = 20;
-        }
+    
+    public static InteractionGraph generate(int peerCnt, int interactionCnt) {
 
         // betere random
         Random r = new Random();
@@ -47,8 +33,8 @@ public class InteractionGraphGenerator {
             interactionsCreated++;
 
         }
-
-        new InteractionGraphToViz(g, "output.gv").run();
+        
+        return g;
 
     }
 
