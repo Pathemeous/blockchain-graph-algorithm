@@ -6,11 +6,20 @@ package nl.tudelft.ti2306.blockchain.datastructure;
  */
 public class Peer {
     
+    private int id;
     private String name;
     private Interaction previous;
     
-    Peer(String name) {
+    Peer(int id, String name) {
+        this.id = id;
         this.name = name;
+    }
+
+    /**
+     * @return the id
+     */
+    public int getId() {
+        return id;
     }
 
     /**

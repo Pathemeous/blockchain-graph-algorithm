@@ -23,13 +23,8 @@ public class InteractionGraph {
         nodes = new ArrayList<>();
         peers = new ArrayList<>(initialPeers);
         for (int i = 0; i < initialPeers; i++) {
-            peers.add(new Peer("Peer" + i));
+            addPeer("Peer" + i);
         }
-    }
-    
-    public InteractionGraph(List<Peer> initialPeers) {
-        nodes = new ArrayList<>();
-        peers = new ArrayList<>(initialPeers);
     }
     
     public void addInteraction(int peer1, int peer2, long timestamp) {
@@ -48,11 +43,11 @@ public class InteractionGraph {
     }
     
     public void addPeer() {
-        peers.add(new Peer("Peer" + peers.size()));
+        peers.add(new Peer(peers.size(), "Peer" + peers.size()));
     }
     
     public void addPeer(String name) {
-        peers.add(new Peer(name));
+        peers.add(new Peer(peers.size(), name));
     }
 
     /**
