@@ -1,8 +1,5 @@
 package nl.tudelft.ti2306.blockchain.datastructure;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 /**
  * Data class for storing a Peer.
  * @author Maarten
@@ -10,15 +7,10 @@ import java.security.NoSuchAlgorithmException;
 public class Peer {
     
     private String name;
-    private byte[] hash;
+    private Interaction previous;
     
-    public Peer(String name) {
+    Peer(String name) {
         this.name = name;
-        try {
-            this.hash = MessageDigest.getInstance("MD5").digest(name.getBytes());
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
     }
 
     /**
@@ -29,10 +21,17 @@ public class Peer {
     }
 
     /**
-     * @return the hash
+     * @param previous the previous to set
      */
-    public byte[] getHash() {
-        return hash;
+    public void setPrevious(Interaction previous) {
+        this.previous = previous;
+    }
+
+    /**
+     * @return the previous
+     */
+    public Interaction getPrevious() {
+        return previous;
     }
 
     /**
@@ -42,7 +41,7 @@ public class Peer {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((hash == null) ? 0 : hash.hashCode());
+        result = prime * result + ((name == null) ? 0 : name.hashCode());
         return result;
     }
 
@@ -58,10 +57,10 @@ public class Peer {
         if (getClass() != obj.getClass())
             return false;
         Peer other = (Peer) obj;
-        if (hash == null) {
-            if (other.hash != null)
+        if (name == null) {
+            if (other.name != null)
                 return false;
-        } else if (!hash.equals(other.hash))
+        } else if (!name.equals(other.name))
             return false;
         return true;
     }
