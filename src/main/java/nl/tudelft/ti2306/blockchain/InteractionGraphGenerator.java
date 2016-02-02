@@ -9,10 +9,12 @@ import nl.tudelft.ti2306.blockchain.datastructure.InteractionGraph;
  */
 public class InteractionGraphGenerator {
     
-    public static InteractionGraph generate(int peerCnt, int interactionCnt) {
-
-        // betere random
-        Random r = new Random();
+    public static final int LINEAR = 0;
+    public static final int QUAD = 1;
+    
+    private static Random random = new Random();
+    
+    public static InteractionGraph generate(int peerCnt, int interactionCnt, int method) {
 
         InteractionGraph g = new InteractionGraph(peerCnt);
 
@@ -20,8 +22,9 @@ public class InteractionGraphGenerator {
 
         while (interactionsCreated < interactionCnt) {
 
-            int p1 = r.nextInt(g.getPeers().size());
-            int p2 = r.nextInt(g.getPeers().size());
+            int n = g.getPeers().size();
+            int p1 = selectPeer(n, method);
+            int p2 = selectPeer(n, method);
 
             // prevent interactions with same peers
             if (p1 == p2) {
@@ -36,6 +39,16 @@ public class InteractionGraphGenerator {
         
         return g;
 
+    }
+
+    private static int selectPeer(int n, int method) {
+        int res;
+        switch (method) {
+        default:
+        case LINEAR: res = random.nextInt(n); break;
+        case QUAD:   res = n - 1 - (int) Math.sqrt(random.nextInt(n * n)); break;
+        }
+        return res;
     }
 
 }

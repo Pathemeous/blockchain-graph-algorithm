@@ -25,7 +25,8 @@ public class Main {
             interactionCnt = 20;
         }
 
-        InteractionGraph graph = InteractionGraphGenerator.generate(peerCnt, interactionCnt);
+        InteractionGraph graph = InteractionGraphGenerator.generate(
+                peerCnt, interactionCnt, InteractionGraphGenerator.QUAD);
         new InteractionGraphToViz(graph, "output.gv").run();
         System.out.println("Done");
     }
