@@ -1,6 +1,7 @@
 package nl.tudelft.ti2306.blockchain;
 
 import nl.tudelft.ti2306.blockchain.datastructure.InteractionGraph;
+import nl.tudelft.ti2306.blockchain.datastructure.PeerGraph;
 
 /**
  * @author Maarten
@@ -28,7 +29,12 @@ public class Main {
         InteractionGraph graph = InteractionGraphGenerator.generate(
                 peerCnt, interactionCnt, InteractionGraphGenerator.QUAD);
         new InteractionGraphToViz(graph, "output.gv").run();
-        System.out.println("Done");
+
+//        PeerGraph pgraph = PeerGraphGenerator.generate(
+//                peerCnt, PeerGraphGenerator.UNIFORM, 5, 0.1);
+//        new PeerGraphToViz(pgraph, "output.gv").run();
+
+        System.out.println("Generated graph");
     }
 
 }

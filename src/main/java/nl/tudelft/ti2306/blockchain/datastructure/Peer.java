@@ -8,11 +8,17 @@ public class Peer {
     
     private int id;
     private String name;
+    private double uploadSpeed;
     private Interaction previous;
     
-    Peer(int id, String name) {
+    Peer(int id, String name, double uploadSpeed) {
         this.id = id;
         this.name = name;
+        this.uploadSpeed = uploadSpeed;
+    }
+    
+    Peer(int id, String name) {
+        this(id, name, 42);
     }
 
     /**
@@ -27,6 +33,20 @@ public class Peer {
      */
     public String getName() {
         return name;
+    }
+
+    /**
+     * @return the uploadSpeed
+     */
+    public double getUploadSpeed() {
+        return uploadSpeed;
+    }
+
+    /**
+     * @param uploadSpeed the uploadSpeed to set
+     */
+    public void setUploadSpeed(double uploadSpeed) {
+        this.uploadSpeed = uploadSpeed;
     }
 
     /**
