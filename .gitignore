@@ -15,7 +15,8 @@ hs_err_pid*
 # Eclipse Project files
 .project
 .classpath
-.settings
+.settings/
+.metadata/
 
 # output files
 output*
