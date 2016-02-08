@@ -57,6 +57,10 @@ public class PeerGraphGenerator {
                     if (peer1 == peer2) continue;
                     count += res.getEdges(peer2).size();
                     if (count > i) {
+                        if (res.getEdges(peer1).contains(peer2)) {
+                            edges--;
+                            break;
+                        }
                         res.addEdge(peer1, peer2);
                         break;
                     }
