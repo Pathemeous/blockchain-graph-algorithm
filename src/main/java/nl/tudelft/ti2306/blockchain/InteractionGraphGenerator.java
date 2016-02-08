@@ -58,6 +58,7 @@ public class InteractionGraphGenerator {
         int interactionsCreated = 0;
         while (interactionsCreated < interactionCnt) {
             int peer1 = random.nextInt(n);
+            if (pgraph.getEdges(peer1).size() < 1) continue;
             int peer2 = pgraph.getEdges(peer1).get(random.nextInt(pgraph.getEdges(peer1).size()));
             res.addInteraction(peer1, peer2, interactionsCreated);
             interactionsCreated++;
