@@ -13,26 +13,27 @@ public class Main {
      */
     public static void main(String ... args) {
 
-        final int peerCnt;
-        final int interactionCnt;
+        int peerCnt = 10;
+        int interactionCnt = 50;
+        int graphDegree = 4;
 
         switch (args.length) {
+        case 3:
+            graphDegree    = Integer.valueOf(args[2]);
         case 2:
-            peerCnt        = Integer.valueOf(args[0]);
             interactionCnt = Integer.valueOf(args[1]);
+        case 1:
+            peerCnt        = Integer.valueOf(args[0]);
             break;
-        default:
-            peerCnt = 5;
-            interactionCnt = 20;
         }
 
-        InteractionGraph graph = InteractionGraphGenerator.generate(
-                peerCnt, interactionCnt, InteractionGraphGenerator.QUAD);
-        new InteractionGraphToViz(graph, "output.gv").run();
+        PeerGraph pgraph = PeerGraphGenerator.generate(
+                peerCnt, PeerGraphGenerator.SMALL_WORLD, graphDegree, 0.1);
+        new PeerGraphToViz(pgraph, "outputPeer.gv").run();
 
-//        PeerGraph pgraph = PeerGraphGenerator.generate(
-//                peerCnt, PeerGraphGenerator.UNIFORM, 5, 0.1);
-//        new PeerGraphToViz(pgraph, "output.gv").run();
+        InteractionGraph graph = InteractionGraphGenerator.generate(
+                pgraph, interactionCnt);
+        new InteractionGraphToViz(graph, "output.gv").run();
 
         System.out.println("Generated graph");
     }

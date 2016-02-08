@@ -3,6 +3,7 @@ package nl.tudelft.ti2306.blockchain;
 import java.util.Random;
 
 import nl.tudelft.ti2306.blockchain.datastructure.InteractionGraph;
+import nl.tudelft.ti2306.blockchain.datastructure.PeerGraph;
 
 /**
  * Created by justin on 02/02/16.
@@ -47,6 +48,19 @@ public class InteractionGraphGenerator {
         default:
         case LINEAR: res = random.nextInt(n); break;
         case QUAD:   res = n - 1 - (int) Math.sqrt(random.nextInt(n * n)); break;
+        }
+        return res;
+    }
+    
+    public static InteractionGraph generate(PeerGraph pgraph, int interactionCnt) {
+        int n = pgraph.getNodes().size();
+        InteractionGraph res = new InteractionGraph(n);
+        int interactionsCreated = 0;
+        while (interactionsCreated < interactionCnt) {
+            int peer1 = random.nextInt(n);
+            int peer2 = pgraph.getEdges(peer1).get(random.nextInt(pgraph.getEdges(peer1).size()));
+            res.addInteraction(peer1, peer2, interactionsCreated);
+            interactionsCreated++;
         }
         return res;
     }
