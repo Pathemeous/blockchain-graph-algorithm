@@ -35,7 +35,7 @@ public class PeerGraphGenerator {
         switch (method) {
         case SMALL_WORLD: 
             for (int peer1 = 0; peer1 < peerCount; peer1++) {
-                for (int i = 1; i < degree + 1; i++) {
+                for (int i = 1; i < degree / 2 + 1; i++) {
                     if (random.nextDouble() < params[0]) {
                         int peer2;
                         while ((peer2 = random.nextInt(peerCount)) == peer1)
@@ -49,7 +49,7 @@ public class PeerGraphGenerator {
             break;
         case SCALE_FREE:
             res.addEdge(0, 1);
-            for (int edges = 1; edges < peerCount * degree; edges++) {
+            for (int edges = 1; edges < peerCount * degree / 2; edges++) {
                 int count = 0;
                 int i = random.nextInt(edges * 2); // edge connects two nodes
                 int peer1 = random.nextInt(peerCount);
@@ -64,7 +64,7 @@ public class PeerGraphGenerator {
             }
             break;
         case UNIFORM:
-            for (int edges = 0; edges < peerCount * degree; edges++) {
+            for (int edges = 0; edges < peerCount * degree / 2; edges++) {
                 int peer1 = random.nextInt(peerCount);
                 int peer2;
                 while ((peer2 = random.nextInt(peerCount)) == peer1)
