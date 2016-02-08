@@ -21,7 +21,7 @@ public class PeerGraphToViz implements Runnable {
         try (PrintWriter out = new PrintWriter(new File(output))) {
             out.println("graph peergraph {");
             out.println("ratio=expand;");
-            out.println("node[width=.20,height=.20, label=\"\"]");
+            out.println("node[width=.40,height=.40, label=\"\"]");
             out.println("edge[arrowsize=\"0.3\"]");
             for (int i = 0; i < graph.getNodes().size(); i++) {
                 out.println(i + " [label=" + i + " style=filled fillcolor=red]");

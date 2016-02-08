@@ -22,17 +22,17 @@ public class Main {
             interactionCnt = Integer.valueOf(args[1]);
             break;
         default:
-            peerCnt = 5;
-            interactionCnt = 20;
+            peerCnt = 10;
+            interactionCnt = 50;
         }
 
-        InteractionGraph graph = InteractionGraphGenerator.generate(
-                peerCnt, interactionCnt, InteractionGraphGenerator.QUAD);
-        new InteractionGraphToViz(graph, "output.gv").run();
+        PeerGraph pgraph = PeerGraphGenerator.generate(
+                peerCnt, PeerGraphGenerator.SCALE_FREE, 5, 0.1);
+        new PeerGraphToViz(pgraph, "outputPeer.gv").run();
 
-//        PeerGraph pgraph = PeerGraphGenerator.generate(
-//                peerCnt, PeerGraphGenerator.UNIFORM, 5, 0.1);
-//        new PeerGraphToViz(pgraph, "output.gv").run();
+        InteractionGraph graph = InteractionGraphGenerator.generate(
+                pgraph, interactionCnt);
+        new InteractionGraphToViz(graph, "output.gv").run();
 
         System.out.println("Generated graph");
     }
