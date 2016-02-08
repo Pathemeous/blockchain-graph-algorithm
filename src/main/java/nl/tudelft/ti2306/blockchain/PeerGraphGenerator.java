@@ -2,7 +2,9 @@ package nl.tudelft.ti2306.blockchain;
 
 import java.util.Random;
 
+import nl.tudelft.ti2306.blockchain.datastructure.Peer;
 import nl.tudelft.ti2306.blockchain.datastructure.PeerGraph;
+import nl.tudelft.ti2306.blockchain.util.WeightedRandom;
 
 /**
  * Generates a PeerGraph.
@@ -50,23 +52,16 @@ public class PeerGraphGenerator {
             }
             break;
         case SCALE_FREE:
+            WeightedRandom<Peer> weightedRandom = new WeightedRandom<>(res.getNodes(), i->res.getEdges(i).size());
             res.addEdge(0, 1);
             for (int edges = 1; edges < peerCount * degree / 2; edges++) {
-                int count = 0;
-                int i = random.nextInt(edges * 2); // edge connects two nodes
                 int peer1 = random.nextInt(peerCount);
-                for (int peer2 = 0; peer2 < peerCount; peer2++) {
-                    if (peer1 == peer2) continue;
-                    count += res.getEdges(peer2).size();
-                    if (count > i) {
-                        if (res.getEdges(peer1).contains(peer2)) {
-                            edges--;
-                            break;
-                        }
-                        res.addEdge(peer1, peer2);
-                        break;
-                    }
+                int peer2 = weightedRandom.next().getId();
+                if (peer1 == peer2 || res.getEdges(peer1).contains(peer2)) {
+                    edges--;
+                    continue;
                 }
+                res.addEdge(peer1, peer2);
             }
             break;
         case UNIFORM:
