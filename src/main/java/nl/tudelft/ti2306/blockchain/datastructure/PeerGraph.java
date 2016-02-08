@@ -2,6 +2,7 @@ package nl.tudelft.ti2306.blockchain.datastructure;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -61,6 +62,26 @@ public class PeerGraph {
      */
     public List<Integer> getEdges(Peer peer) {
         return getEdges(nodes.indexOf(peer));
+    }
+
+    public static class EdgeAmountSorter implements Comparator<Peer> {
+    
+        PeerGraph graph;
+        
+        /**
+         * @param graph PeerGraph to be used for sorting
+         */
+        public EdgeAmountSorter(PeerGraph graph) {
+            super();
+            this.graph = graph;
+        }
+    
+        @Override
+        public int compare(Peer a, Peer b) {
+            return graph.getEdges(((Peer)b).getId()).size() -
+                    graph.getEdges(((Peer)a).getId()).size();
+        }
+    
     }
 
 }
