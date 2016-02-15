@@ -1,12 +1,24 @@
 package nl.tudelft.ti2306.blockchain;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
 
 import nl.tudelft.ti2306.blockchain.datastructure.Interaction;
 import nl.tudelft.ti2306.blockchain.datastructure.Peer;
+import nl.tudelft.ti2306.blockchain.datastructure.PeerGraph;
 
 public class Util {
 
@@ -52,6 +64,50 @@ public class Util {
         return null;
     }
 
+    private static String ListToString(Collection collection) {
+        StringBuilder out = new StringBuilder();
+        out.append("[");
+        for (Object o : collection) {
+            out.append(String.format("%s ", o));
+        }
+        out.append("]");
+        return out.toString();
+    }
+
+    public static List<List<Peer>> getAllPaths(Peer source, Peer destination, PeerGraph pgraph) {
+        List<List<Peer>> paths = new ArrayList<>();
+        recursive(source, destination, paths, new LinkedHashSet<>(), pgraph);
+        return paths;
+    }
+
+    private static void recursive (Peer current, Peer destination, List<List<Peer>> paths, LinkedHashSet<Peer> path, PeerGraph pgraph) {
+
+        System.out.println("Current path: " + ListToString(path));
+
+        path.add(current);
+
+        if (current == destination) {
+            System.out.println("Found destination!");
+            paths.add(new ArrayList<>(path));
+            path.remove(current);
+            return;
+        }
+
+        final Collection<Integer> edges = pgraph.getEdges(current);
+
+        for (Integer i : edges) {
+            if (edges == current) continue;
+
+            Peer p = pgraph.getNodes().get(i);
+
+            if (!path.contains(p)) {
+                recursive (p, destination, paths, path, pgraph);
+            }
+        }
+
+        path.remove(current);
+    }
+
     /**
      * Naive approach getting the hop count.
      * When return value is 0, <tt>from</tt> has seen <tt>to</tt> himself, or they are equal.
@@ -85,3 +141,4 @@ public class Util {
     }
 
 }
+
