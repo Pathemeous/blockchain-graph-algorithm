@@ -25,7 +25,10 @@ public class PeerGraphToViz implements Runnable {
             out.println("edge[arrowsize=\"0.3\"]");
             for (int i = 0; i < graph.getNodes().size(); i++) {
                 double hue = i / (double) graph.getNodes().size();
-                out.println(i + " [label=" + i + " style=filled fillcolor=\"" + hue + " 1.0 1.0\"]");
+                double spd = Math.round(graph.getNodes().get(i).getUploadSpeed() * 100) / 100.0;
+                out.println(i + " [label=<" + i + "<BR />"
+                        + "<FONT POINT-SIZE=\"8\">" + spd + "</FONT>> "
+                        + "style=filled fillcolor=\"" + hue + " 1.0 1.0\"]");
                 for (int j = 0; j < graph.getEdges(i).size(); j++) {
                     int k = graph.getEdges(i).get(j);
                     if (i > k) continue;
