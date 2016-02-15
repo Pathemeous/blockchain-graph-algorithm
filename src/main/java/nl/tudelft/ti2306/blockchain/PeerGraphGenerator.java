@@ -15,6 +15,9 @@ public class PeerGraphGenerator {
     public static final int SMALL_WORLD = 0;
     public static final int SCALE_FREE = 1;
     public static final int UNIFORM = 2;
+    
+    // https://en.wikipedia.org/wiki/List_of_countries_by_Internet_connection_speeds
+    private static final double[] SPEEDS = new double[]{20.5,17.4,16.4,16.2,15.8,15.6,15,14.8,14.5,14,13.1,13,12.8,12.6,12.5,12.4,11.9,11.5,11.4,11.2,11.2,10.7,10.6,10.6,10.4,10.2,10.1,8.7,8.2,8.2,7.8,6.8,6.5,6.2,5.9,5.7,5.5,5.1,4.9,4.4,4.2,4.2,4.1,3.7,3.7,3.6,3.5,3.4,3.2,3,2.8,2.5,1.8,1.5,1.5};
 
     private static Random random = new Random();
 
@@ -34,6 +37,9 @@ public class PeerGraphGenerator {
             return new PeerGraph(1);
 
         PeerGraph res = new PeerGraph(peerCount);
+        for (Peer p : res.getNodes()) {
+            p.setUploadSpeed(SPEEDS[random.nextInt(SPEEDS.length)] * (0.5 + random.nextDouble()));
+        }
         switch (method) {
         case SMALL_WORLD: 
             for (int peer1 = 0; peer1 < peerCount; peer1++) {
