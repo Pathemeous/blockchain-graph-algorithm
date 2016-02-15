@@ -22,11 +22,11 @@ public class Main {
      */
     public static void main(String ... args) {
 
-        int peerCnt = 100;
-        int graphDegree = 10;
+        int peerCnt = 10;
+        int graphDegree = 2;
         int method = PeerGraphGenerator.SCALE_FREE;
         double param = 0.1;
-        int interactionCnt = 1000;
+        int interactionCnt = 30;
         int experimentCnt = 50;
         int fileSize = 100;
 
