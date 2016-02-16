@@ -125,7 +125,7 @@ public class Main {
         if (!print) return;
 
         List<Peer> list = new ArrayList<>(pgraph.getNodes());
-        Collections.sort(list, new PeerGraph.EdgeAmountSorter(pgraph));
+        Collections.sort(list, pgraph.new EdgeAmountSorter());
         for (Peer p : list) {
             System.out.println(p.getId() + "\t" + pgraph.getEdges(p.getId()).size() + " edges");
         }

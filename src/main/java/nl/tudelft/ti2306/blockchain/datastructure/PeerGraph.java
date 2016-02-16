@@ -64,22 +64,19 @@ public class PeerGraph {
         return getEdges(nodes.indexOf(peer));
     }
 
-    public static class EdgeAmountSorter implements Comparator<Peer> {
-    
-        PeerGraph graph;
+    public class EdgeAmountSorter implements Comparator<Peer> {
         
         /**
          * @param graph PeerGraph to be used for sorting
          */
-        public EdgeAmountSorter(PeerGraph graph) {
+        public EdgeAmountSorter() {
             super();
-            this.graph = graph;
         }
     
         @Override
         public int compare(Peer a, Peer b) {
-            return graph.getEdges(((Peer)b).getId()).size() -
-                    graph.getEdges(((Peer)a).getId()).size();
+            return PeerGraph.this.getEdges(((Peer)b).getId()).size() -
+                    PeerGraph.this.getEdges(((Peer)a).getId()).size();
         }
     
     }
