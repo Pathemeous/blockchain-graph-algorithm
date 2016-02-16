@@ -106,7 +106,7 @@ public class Peer {
      */
     @Override
     public String toString() {
-        return "Peer[" + name + "]";
+        return "Peer[" + id + "]";
     }
     
 }

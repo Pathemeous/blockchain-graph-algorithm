@@ -1,18 +1,11 @@
 package nl.tudelft.ti2306.blockchain;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
 
@@ -64,7 +57,7 @@ public class Util {
         return null;
     }
 
-    private static String ListToString(Collection collection) {
+    public static String listToString(Collection<? extends Object> collection) {
         StringBuilder out = new StringBuilder();
         out.append("[");
         for (Object o : collection) {
@@ -74,38 +67,41 @@ public class Util {
         return out.toString();
     }
 
-    public static List<List<Peer>> getAllPaths(Peer source, Peer destination, PeerGraph pgraph) {
-        List<List<Peer>> paths = new ArrayList<>();
-        recursive(source, destination, paths, new LinkedHashSet<>(), pgraph);
-        return paths;
-    }
-
-    private static void recursive (Peer current, Peer destination, List<List<Peer>> paths, LinkedHashSet<Peer> path, PeerGraph pgraph) {
-
-        System.out.println("Current path: " + ListToString(path));
-
-        path.add(current);
-
-        if (current == destination) {
-            System.out.println("Found destination!");
-            paths.add(new ArrayList<>(path));
-            path.remove(current);
-            return;
-        }
-
-        final Collection<Integer> edges = pgraph.getEdges(current);
-
-        for (Integer i : edges) {
-            if (edges == current) continue;
-
-            Peer p = pgraph.getNodes().get(i);
-
-            if (!path.contains(p)) {
-                recursive (p, destination, paths, path, pgraph);
+    public static Map<Peer, List<List<Peer>>> getAllPaths(PeerGraph pgraph, Peer source) {
+        int n = pgraph.getNodes().size();
+        Map<Peer, List<List<Peer>>> map = new HashMap<>();
+        for (Peer p : pgraph.getNodes()) {
+            map.put(p, new LinkedList<>());
+            if (pgraph.getEdges(p.getId()).contains(source.getId())) {
+                map.get(p).add(new LinkedList<Peer>());
+                map.get(p).get(0).add(p);
+                map.get(p).get(0).add(source);
             }
         }
+        for (int i = 0; i < n - 1; i++) {
+            for (Peer p : pgraph.getNodes()) {
+                for (Integer z : pgraph.getEdges(p.getId())) {
+                    Peer q = pgraph.getNodes().get(z);
+//                    System.out.printf("%d,%d\n", p.getId(), q.getId());
+                    for (List<Peer> path : map.get(q)) {
+                        if (!path.contains(p)) {
+                            List<Peer> newPath = concat(p, path);
+                            if (!map.get(p).contains(newPath))
+                                map.get(p).add(newPath);
+                        }
+                    }
+                }
+            }
+        }
+        map.remove(source);
+        return map;
+    }
 
-        path.remove(current);
+    private static List<Peer> concat(Peer p, List<Peer> path) {
+        LinkedList<Peer> res = new LinkedList<>();
+        res.add(p);
+        res.addAll(path);
+        return res;
     }
 
     /**

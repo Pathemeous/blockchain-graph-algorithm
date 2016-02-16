@@ -6,6 +6,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import nl.tudelft.ti2306.blockchain.datastructure.InteractionGraph;
 import nl.tudelft.ti2306.blockchain.datastructure.Peer;
@@ -55,8 +57,8 @@ public class Main {
 
         generate(peerCnt, method, interactionCnt, graphDegree, param, false);
 
-        experiment(experimentCnt, fileSize, 
-                peerCnt, method, interactionCnt, graphDegree, param);
+//        experiment(experimentCnt, fileSize, 
+//                peerCnt, method, interactionCnt, graphDegree, param);
         System.out.println("Experiment Done");
     }
 
@@ -122,6 +124,14 @@ public class Main {
         new InteractionGraphToViz(igraph, "output.gv").run();
 
         System.out.println("Generated graph");
+        Set<Entry<Peer, List<List<Peer>>>> map = Util.getAllPaths(pgraph, pgraph.getNodes().get(0)).entrySet();
+        for (Entry<Peer, List<List<Peer>>> e : map) {
+            System.out.printf("======= %d =======\n", e.getKey().getId());
+            for (List<Peer> path : e.getValue()) {
+                System.out.println(path);
+            }
+        }
+    
         if (!print) return;
 
         List<Peer> list = new ArrayList<>(pgraph.getNodes());
