@@ -20,3 +20,6 @@ hs_err_pid*
 
 # output files
 output*
+
+# Random R-related files
+.R*
