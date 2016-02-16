@@ -54,7 +54,7 @@ public class InteractionGraphGenerator {
     
     public static InteractionGraph generate(PeerGraph pgraph, int interactionCnt) {
         int n = pgraph.getNodes().size();
-        InteractionGraph res = new InteractionGraph(n);
+        InteractionGraph res = new InteractionGraph(pgraph.getNodes());
         int interactionsCreated = 0;
         while (interactionsCreated < interactionCnt) {
             int peer1 = random.nextInt(n);

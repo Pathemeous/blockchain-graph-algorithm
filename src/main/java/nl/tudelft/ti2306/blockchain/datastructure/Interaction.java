@@ -81,4 +81,13 @@ public class Interaction {
         return Arrays.asList(child);
     }
 
+    /**
+     * @see java.lang.Object#toString()
+     */
+    @Override
+    public String toString() {
+        return "Interaction [" + Arrays.toString(peer) + ", "
+                + timestamp + "]";
+    }
+
 }

@@ -1,7 +1,7 @@
 package nl.tudelft.ti2306.blockchain.datastructure;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Data class for storing a Peer.
@@ -13,13 +13,13 @@ public class Peer {
     private String name;
     private double uploadSpeed;
     private Interaction previous;
-    public Set<Peer> seenPeers = new HashSet<>();
+    public Map<Peer, Interaction> seenPeers;
     
     Peer(int id, String name, double uploadSpeed) {
         this.id = id;
         this.name = name;
         this.uploadSpeed = uploadSpeed;
-        seenPeers.add(this);
+        this.seenPeers = new HashMap<>();
     }
     
     Peer(int id, String name) {
@@ -55,12 +55,12 @@ public class Peer {
     }
 
     /**
-     * @param previous the previous to set
+     * @param ia the previous to set
      */
-    public void setPrevious(Interaction previous) {
-        seenPeers.add(previous.getPeer1());
-        seenPeers.add(previous.getPeer2());
-        this.previous = previous;
+    public void setPrevious(Interaction ia) {
+        ia.getPeer1().seenPeers.put(ia.getPeer2(), ia);
+        ia.getPeer2().seenPeers.put(ia.getPeer1(), ia);
+        this.previous = ia;
     }
 
     /**
@@ -68,6 +68,13 @@ public class Peer {
      */
     public Interaction getPrevious() {
         return previous;
+    }
+
+    /**
+     * @return the previous
+     */
+    public Interaction getPrevious(Peer other) {
+        return seenPeers.get(other);
     }
 
     /**

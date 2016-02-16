@@ -1,5 +1,6 @@
 package nl.tudelft.ti2306.blockchain;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,13 +68,20 @@ public class Util {
         return out.toString();
     }
 
+    private static List<Peer> concat(Peer p, List<Peer> path) {
+        ArrayList<Peer> res = new ArrayList<>();
+        res.add(p);
+        res.addAll(path);
+        return res;
+    }
+
     public static Map<Peer, List<List<Peer>>> getAllPaths(PeerGraph pgraph, Peer source) {
         int n = pgraph.getNodes().size();
         Map<Peer, List<List<Peer>>> map = new HashMap<>();
         for (Peer p : pgraph.getNodes()) {
-            map.put(p, new LinkedList<>());
+            map.put(p, new ArrayList<>());
             if (pgraph.getEdges(p.getId()).contains(source.getId())) {
-                map.get(p).add(new LinkedList<Peer>());
+                map.get(p).add(new ArrayList<Peer>());
                 map.get(p).get(0).add(p);
                 map.get(p).get(0).add(source);
             }
@@ -96,12 +104,39 @@ public class Util {
         map.remove(source);
         return map;
     }
-
-    private static List<Peer> concat(Peer p, List<Peer> path) {
-        LinkedList<Peer> res = new LinkedList<>();
-        res.add(p);
-        res.addAll(path);
-        return res;
+    
+    /**
+     * Only for use if you need ONE SINGLE source-dest, calls getAllPaths!
+     */
+    public static double calculateTrust(PeerGraph pgraph, Peer source, Peer dest, long currTime) {
+        return calculateTrust(pgraph, source, getAllPaths(pgraph, source).get(dest), currTime);
+    }
+    
+    public static double calculateTrust(PeerGraph pgraph, Peer source, List<List<Peer>> allPathsToDest, long currTime) {
+        double failChance = 1.0;
+        double pathSucceed, edgeSucceed;
+        Peer p, q;
+        Interaction last;
+        System.out.println("currTime: " + currTime);
+        for (List<Peer> path : allPathsToDest) {
+            System.out.println(path);
+            pathSucceed = 1.0;
+            for (int i = 0; i < path.size() - 1; i++) {
+                p = path.get(i);
+                q = path.get(i + 1);
+                last = p.getPrevious(q);
+                if (last == null) {
+                    pathSucceed = 0;
+                    break;
+                }
+                edgeSucceed = 1.0 - (currTime - last.getTimestamp()) / 100.0;
+                pathSucceed *= Math.max(0, edgeSucceed);
+                System.out.printf("%d %f; ", last.getTimestamp(), edgeSucceed);
+            }
+            failChance *= 1.0 - pathSucceed;
+            System.out.printf(": %f\n", pathSucceed);
+        }
+        return 1.0 - failChance;
     }
 
     /**
@@ -114,13 +149,13 @@ public class Util {
 
     private static int getHopCount(final Peer from, final Peer to, final Set<Peer> visited) {
 
-        if (from.seenPeers.contains(to)) {
+        if (from.seenPeers.keySet().contains(to)) {
             return 0;
         }
 
         int out = -1;
 
-        for (Peer peer : from.seenPeers) {
+        for (Peer peer : from.seenPeers.keySet()) {
             if (visited.contains(peer)) {
                 continue;
             }

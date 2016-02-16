@@ -27,6 +27,11 @@ public class InteractionGraph {
         }
     }
     
+    public InteractionGraph(List<Peer> peers) {
+        this.nodes = new ArrayList<>();
+        this.peers = peers;
+    }
+
     public void addInteraction(int peer1, int peer2, long timestamp) {
         Interaction ia = new Interaction(peers.get(peer1), peers.get(peer2), timestamp);
         if (root == null) {

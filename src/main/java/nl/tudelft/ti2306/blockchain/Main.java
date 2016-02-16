@@ -6,8 +6,8 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 
 import nl.tudelft.ti2306.blockchain.datastructure.InteractionGraph;
 import nl.tudelft.ti2306.blockchain.datastructure.Peer;
@@ -124,13 +124,14 @@ public class Main {
         new InteractionGraphToViz(igraph, "output.gv").run();
 
         System.out.println("Generated graph");
-        Set<Entry<Peer, List<List<Peer>>>> map = Util.getAllPaths(pgraph, pgraph.getNodes().get(0)).entrySet();
-        for (Entry<Peer, List<List<Peer>>> e : map) {
-            System.out.printf("======= %d =======\n", e.getKey().getId());
-            for (List<Peer> path : e.getValue()) {
-                System.out.println(path);
-            }
-        }
+        Map<Peer, List<List<Peer>>> map = Util.getAllPaths(pgraph, pgraph.getNodes().get(0));
+//        for (Entry<Peer, List<List<Peer>>> e : map.entrySet()) {
+//            System.out.printf("======= %d =======\n", e.getKey().getId());
+//            for (List<Peer> path : e.getValue()) {
+//                System.out.println(path);
+//            }
+//        }
+        System.out.println(Util.calculateTrust(pgraph, pgraph.getNodes().get(0), map.get(pgraph.getNodes().get(peerCnt - 1)), interactionCnt));
     
         if (!print) return;
 
