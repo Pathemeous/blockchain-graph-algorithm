@@ -67,6 +67,7 @@ public class Main {
         double[][] calculateTime = new double[100][expermentCnt];
         double[][] downloadTime = new double[100][expermentCnt];
         for (int i = 0; i < expermentCnt; i++) {
+            System.out.println("Experiment " + (i+1) + " out of " + expermentCnt);
             PeerGraph pgraph = PeerGraphGenerator.generate(
                     peerCnt, method, graphDegree, param);
             InteractionGraph igraph = InteractionGraphGenerator.generate(
