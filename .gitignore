@@ -18,6 +18,10 @@ hs_err_pid*
 .settings/
 .metadata/
 
+# IntelliJ Project Files
+.idea/
+*.iml
+
 # output files
 output*
 
