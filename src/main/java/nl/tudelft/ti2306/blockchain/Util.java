@@ -76,6 +76,10 @@ public class Util {
     }
 
     public static Map<Peer, List<List<Peer>>> getAllPaths(PeerGraph pgraph, Peer source) {
+        return getAllPaths(pgraph, source, 0);
+    }
+
+    public static Map<Peer, List<List<Peer>>> getAllPaths(PeerGraph pgraph, Peer source, long minTime) {
         int n = pgraph.getNodes().size();
         Map<Peer, List<List<Peer>>> map = new HashMap<>();
         for (Peer p : pgraph.getNodes()) {
@@ -90,7 +94,10 @@ public class Util {
             for (Peer p : pgraph.getNodes()) {
                 for (Integer z : pgraph.getEdges(p.getId())) {
                     Peer q = pgraph.getNodes().get(z);
-//                    System.out.printf("%d,%d\n", p.getId(), q.getId());
+                    if (p.getPrevious(q) == null)
+                        continue;
+                    if (p.getPrevious(q).getTimestamp() < minTime)
+                        continue;
                     for (List<Peer> path : map.get(q)) {
                         if (!path.contains(p)) {
                             List<Peer> newPath = concat(p, path);
@@ -117,9 +124,7 @@ public class Util {
         double pathSucceed, edgeSucceed;
         Peer p, q;
         Interaction last;
-        System.out.println("currTime: " + currTime);
         for (List<Peer> path : allPathsToDest) {
-            System.out.println(path);
             pathSucceed = 1.0;
             for (int i = 0; i < path.size() - 1; i++) {
                 p = path.get(i);
@@ -131,10 +136,8 @@ public class Util {
                 }
                 edgeSucceed = 1.0 - (currTime - last.getTimestamp()) / 100.0;
                 pathSucceed *= Math.max(0, edgeSucceed);
-                System.out.printf("%d %f; ", last.getTimestamp(), edgeSucceed);
             }
             failChance *= 1.0 - pathSucceed;
-            System.out.printf(": %f\n", pathSucceed);
         }
         return 1.0 - failChance;
     }

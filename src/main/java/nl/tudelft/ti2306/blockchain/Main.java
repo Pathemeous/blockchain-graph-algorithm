@@ -24,11 +24,11 @@ public class Main {
      */
     public static void main(String ... args) {
 
-        int peerCnt = 10;
+        int peerCnt = 30;
         int graphDegree = 2;
         int method = PeerGraphGenerator.SCALE_FREE;
         double param = 0.1;
-        int interactionCnt = 30;
+        int interactionCnt = 100;
         int experimentCnt = 50;
         int fileSize = 100;
 
@@ -57,44 +57,47 @@ public class Main {
 
         generate(peerCnt, method, interactionCnt, graphDegree, param, false);
 
-//        experiment(experimentCnt, fileSize, 
-//                peerCnt, method, interactionCnt, graphDegree, param);
+        experiment(experimentCnt, fileSize, 
+                peerCnt, method, interactionCnt, graphDegree, param);
         System.out.println("Experiment Done");
     }
 
-    private static void experiment(int expermentCnt, double fileSize,
+    private static void experiment(int experimentCnt, double fileSize,
             int peerCnt, int method, int interactionCnt, int graphDegree, double param) {
-        double[][] calculateTime = new double[100][expermentCnt];
-        double[][] downloadTime = new double[100][expermentCnt];
-        for (int i = 0; i < expermentCnt; i++) {
-            System.out.println("Experiment " + (i+1) + " out of " + expermentCnt);
+        final int trials = 10;
+        double[][] calculateTime = new double[experimentCnt][trials];
+        double[][] downloadTime = new double[experimentCnt][trials];
+        for (int i = 0; i < experimentCnt; i++) {
+            System.out.print("Experiment " + (i+1) + " out of " + experimentCnt + " ");
             PeerGraph pgraph = PeerGraphGenerator.generate(
                     peerCnt, method, graphDegree, param);
             InteractionGraph igraph = InteractionGraphGenerator.generate(
                     pgraph, interactionCnt);
-            for (int j = 0; j < 100; j++) {
+            for (int j = 0; j < trials; j++) {
+                System.out.print(".");
                 long start = System.currentTimeMillis();
-                downloadTime[j][i] = fileSize / calculate(pgraph, igraph);
-                calculateTime[j][i] = (System.currentTimeMillis() - start) / 1000.0;
+                downloadTime[i][j] = fileSize / calculate(pgraph, igraph, interactionCnt, interactionCnt * i / experimentCnt);
+                calculateTime[i][j] = (System.currentTimeMillis() - start) / 1000.0;
             }
+            System.out.println();
         }
         try (PrintWriter out = new PrintWriter(new File("output.data"))) {
             out.println("type\tsize\ttime\tstd");
             Statistics stat;
-            for (int j = 0; j < 5; j++) {
-                stat = new Statistics(calculateTime[j]);
+            for (int i = 0; i < experimentCnt; i++) {
+                stat = new Statistics(calculateTime[i]);
                 out.print("calc\t");
-                out.print(j + "\t");
+                out.print(i + "\t");
                 out.print(stat.getMean() + "\t");
                 out.println(stat.getStdDev() + "\t");
-                stat = new Statistics(downloadTime[j]);
+                stat = new Statistics(downloadTime[i]);
                 out.print("down\t");
-                out.print(j + "\t");
+                out.print(i + "\t");
                 out.print(stat.getMean() + "\t");
                 out.println(stat.getStdDev() + "\t");
-                stat.add(calculateTime[j]);
+                stat.add(calculateTime[i]);
                 out.print("total\t");
-                out.print(j + "\t");
+                out.print(i + "\t");
                 out.print(stat.getMean() + "\t");
                 out.println(stat.getStdDev() + "\t");
             }
@@ -103,12 +106,15 @@ public class Main {
         }
     }
 
-    private static double calculate(PeerGraph pgraph, InteractionGraph igraph) {
+    private static double calculate(PeerGraph pgraph, InteractionGraph igraph, long currTime, long minTime) {
         double maxSpeed = 0, spd;
-        for (int i = 0; i < pgraph.getNodes().size(); i++) {
-            spd = pgraph.getNodes().get(i).getUploadSpeed();
-            spd /= (1 + Util.getHopCount(pgraph.getNodes().get(0), pgraph.getNodes().get(i)));
-            maxSpeed = spd > maxSpeed ? spd : maxSpeed;
+        Map<Peer, List<List<Peer>>> allPaths = Util.getAllPaths(pgraph, pgraph.getNodes().get(0), minTime);
+        
+        for (int i = 1; i < pgraph.getNodes().size(); i++) {
+            if (0.9 < Util.calculateTrust(pgraph, pgraph.getNodes().get(0), allPaths.get(pgraph.getNodes().get(i)), currTime)) {
+                spd = pgraph.getNodes().get(i).getUploadSpeed();
+                maxSpeed = spd > maxSpeed ? spd : maxSpeed;
+            }
         }
         return maxSpeed;
     }
@@ -125,16 +131,16 @@ public class Main {
         new InteractionGraphToViz(igraph, "output.gv").run();
 
         System.out.println("Generated graph");
-        Map<Peer, List<List<Peer>>> map = Util.getAllPaths(pgraph, pgraph.getNodes().get(0));
-//        for (Entry<Peer, List<List<Peer>>> e : map.entrySet()) {
-//            System.out.printf("======= %d =======\n", e.getKey().getId());
-//            for (List<Peer> path : e.getValue()) {
-//                System.out.println(path);
-//            }
-//        }
-        System.out.println(Util.calculateTrust(pgraph, pgraph.getNodes().get(0), map.get(pgraph.getNodes().get(peerCnt - 1)), interactionCnt));
-    
         if (!print) return;
+
+        Map<Peer, List<List<Peer>>> map = Util.getAllPaths(pgraph, pgraph.getNodes().get(0));
+        for (Entry<Peer, List<List<Peer>>> e : map.entrySet()) {
+            System.out.printf("======= %d =======\n", e.getKey().getId());
+            for (List<Peer> path : e.getValue()) {
+                System.out.println(path);
+            }
+        }
+        System.out.println(Util.calculateTrust(pgraph, pgraph.getNodes().get(0), map.get(pgraph.getNodes().get(peerCnt - 1)), interactionCnt));
 
         List<Peer> list = new ArrayList<>(pgraph.getNodes());
         Collections.sort(list, pgraph.new EdgeAmountSorter());
