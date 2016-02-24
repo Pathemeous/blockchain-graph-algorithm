@@ -30,7 +30,7 @@ public class InteractionGraphToViz implements Runnable {
                         n.getPeer1().getId() / (double) graph.getPeers().size(), 
                         n.getPeer2().getId() / (double) graph.getPeers().size()
                 };
-                out.println(i + " [style=filled fillcolor="
+                out.println(i + " [label=" + i + " style=filled fillcolor="
                         + "\"" + hue[0] + " 1.0 1.0;0.5:" + hue[1] + " 1.0 1.0\"]");
                 for (int j = 0; j < 2; j++) {
                     if (n.getChildren().get(j) == null) continue;
