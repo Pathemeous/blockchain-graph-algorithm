@@ -85,6 +85,10 @@ public class Util {
         for (Peer p : pgraph.getNodes()) {
             map.put(p, new ArrayList<>());
             if (pgraph.getEdges(p.getId()).contains(source.getId())) {
+                if (p.getPrevious(source) == null)
+                    continue;
+                if (p.getPrevious(source).getTimestamp() < minTime)
+                    continue;
                 map.get(p).add(new ArrayList<Peer>());
                 map.get(p).get(0).add(p);
                 map.get(p).get(0).add(source);
