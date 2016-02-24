@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Random;
 
 import nl.tudelft.ti2306.blockchain.datastructure.InteractionGraph;
 import nl.tudelft.ti2306.blockchain.datastructure.Peer;
@@ -69,15 +70,16 @@ public class Main {
         double[][] downloadTime = new double[experimentCnt][trials];
         for (int i = 0; i < experimentCnt; i++) {
             System.out.print("Experiment " + (i+1) + " out of " + experimentCnt + " ");
-            PeerGraph pgraph = PeerGraphGenerator.generate(
-                    peerCnt, method, graphDegree, param);
-            InteractionGraph igraph = InteractionGraphGenerator.generate(
-                    pgraph, interactionCnt);
             for (int j = 0; j < trials; j++) {
-                System.out.print(".");
+                PeerGraph pgraph = PeerGraphGenerator.generate(
+                        peerCnt, method, graphDegree, param);
+                InteractionGraph igraph = InteractionGraphGenerator.generate(
+                        pgraph, interactionCnt);
                 long start = System.currentTimeMillis();
-                downloadTime[i][j] = fileSize / calculate(pgraph, igraph, interactionCnt, interactionCnt * i / experimentCnt);
+                double speed = calculate(pgraph, igraph, interactionCnt, interactionCnt * i / experimentCnt);
+                downloadTime[i][j] = fileSize / speed;
                 calculateTime[i][j] = (System.currentTimeMillis() - start) / 1000.0;
+                System.out.print(".");
             }
             System.out.println();
         }
@@ -116,6 +118,16 @@ public class Main {
                 maxSpeed = spd > maxSpeed ? spd : maxSpeed;
             }
         }
+        if (maxSpeed == 0) {
+            for (Peer other : pgraph.getNodes().get(0).seenPeers.keySet()) {
+                spd = other.getUploadSpeed();
+                maxSpeed = spd > maxSpeed ? spd : maxSpeed;
+            }
+        }
+        if (maxSpeed == 0) {
+            maxSpeed = pgraph.getNodes().get(new Random().nextInt(pgraph.getNodes().size())).getUploadSpeed();
+        }
+        
         return maxSpeed;
     }
 
