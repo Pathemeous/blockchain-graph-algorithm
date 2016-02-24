@@ -124,16 +124,17 @@ public class Main {
     private static void generate(int peerCnt, int method, int interactionCnt, int graphDegree, double param, boolean print) {
         PeerGraph pgraph = PeerGraphGenerator.generate(
                 peerCnt, method, graphDegree, param);
-        new PeerGraphToViz(pgraph, "outputPeer.gv").run();
 
         InteractionGraph igraph = InteractionGraphGenerator.generate(
                 pgraph, interactionCnt);
+        
+        new PeerGraphToViz(pgraph, "outputPeer.gv").run();
         new InteractionGraphToViz(igraph, "output.gv").run();
 
         System.out.println("Generated graph");
         if (!print) return;
 
-        Map<Peer, List<List<Peer>>> map = Util.getAllPaths(pgraph, pgraph.getNodes().get(0));
+        Map<Peer, List<List<Peer>>> map = Util.getAllPaths(pgraph, pgraph.getNodes().get(0), interactionCnt * 4 / 5);
         for (Entry<Peer, List<List<Peer>>> e : map.entrySet()) {
             System.out.printf("======= %d =======\n", e.getKey().getId());
             for (List<Peer> path : e.getValue()) {

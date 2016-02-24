@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 
+import nl.tudelft.ti2306.blockchain.datastructure.Interaction;
 import nl.tudelft.ti2306.blockchain.datastructure.PeerGraph;
 
 public class PeerGraphToViz implements Runnable {
@@ -32,7 +33,9 @@ public class PeerGraphToViz implements Runnable {
                 for (int j = 0; j < graph.getEdges(i).size(); j++) {
                     int k = graph.getEdges(i).get(j);
                     if (i > k) continue;
-                    out.println(i + "--" + k + " [color=black]");
+                    Interaction ia = graph.getNodes().get(i).getPrevious(graph.getNodes().get(k));
+                    long time = (ia == null ? -1 : ia.getTimestamp());
+                    out.println(i + "--" + k + " [color=black label=" + time + "]");
                 }
             }
             out.println("}");
