@@ -92,7 +92,7 @@ public class Util {
                     continue;
                 if (p.getPrevious(source).getTimestamp() < minTime)
                     continue;
-                // If p and source ever had an interaction and the time is within bounds,
+                // If p and q ever had an interaction and the time is within bounds,
                 // Add an initial path from `p` to `source` to the list of paths
                 map.get(p).add(new ArrayList<Peer>());
                 map.get(p).get(0).add(p);
