@@ -79,31 +79,43 @@ public class Util {
         return getAllPaths(pgraph, source, 0);
     }
 
+    /** Returns for each Peer a List of Paths (Lists of Peers) */
     public static Map<Peer, List<List<Peer>>> getAllPaths(PeerGraph pgraph, Peer source, long minTime) {
         int n = pgraph.getNodes().size();
         Map<Peer, List<List<Peer>>> map = new HashMap<>();
+        // Initialization of return Map
         for (Peer p : pgraph.getNodes()) {
             map.put(p, new ArrayList<>());
+            // If Peer p is connected to `source`
             if (pgraph.getEdges(p.getId()).contains(source.getId())) {
                 if (p.getPrevious(source) == null)
                     continue;
                 if (p.getPrevious(source).getTimestamp() < minTime)
                     continue;
+                // If p and source ever had an interaction and the time is within bounds,
+                // Add an initial path from `p` to `source` to the list of paths
                 map.get(p).add(new ArrayList<Peer>());
                 map.get(p).get(0).add(p);
                 map.get(p).get(0).add(source);
             }
         }
+        // Dynamic programming commences! Path can be max. `n` long because we do not allow cycles
         for (int i = 0; i < n - 1; i++) {
+            // For each Peer `p` in graph
             for (Peer p : pgraph.getNodes()) {
+                // For all edges (p, q)
                 for (Integer z : pgraph.getEdges(p.getId())) {
                     Peer q = pgraph.getNodes().get(z);
                     if (p.getPrevious(q) == null)
                         continue;
                     if (p.getPrevious(q).getTimestamp() < minTime)
                         continue;
+                    // If p and source ever had an interaction and the time is within bounds,
+                    // For all currently known paths from q to source
                     for (List<Peer> path : map.get(q)) {
+                        // If p is not already in the path from q to source
                         if (!path.contains(p)) {
+                            // Add p to the path add the new path to the list
                             List<Peer> newPath = concat(p, path);
                             if (!map.get(p).contains(newPath))
                                 map.get(p).add(newPath);
@@ -117,7 +129,7 @@ public class Util {
     }
     
     /**
-     * Only for use if you need ONE SINGLE source-dest, calls getAllPaths!
+     * Only for use if you need ONE SINGLE source-dest, because it calls getAllPaths!
      */
     public static double calculateTrust(PeerGraph pgraph, Peer source, Peer dest, long currTime) {
         return calculateTrust(pgraph, source, getAllPaths(pgraph, source).get(dest), currTime);

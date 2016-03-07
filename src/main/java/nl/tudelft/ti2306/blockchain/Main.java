@@ -25,13 +25,13 @@ public class Main {
      */
     public static void main(String ... args) {
 
-        int peerCnt = 30;
-        int graphDegree = 2;
-        int method = PeerGraphGenerator.SCALE_FREE;
-        double param = 0.1;
-        int interactionCnt = 200;
-        int experimentCnt = 50;
-        int fileSize = 100;
+        int peerCnt = 30; // Amount of peers
+        int graphDegree = 2; // Average graph degree of peer-graph
+        int method = PeerGraphGenerator.SCALE_FREE; // Method of generating peer-graph
+        double param = 0.1; // For SMALL_WORLD: chance of an edge "crossing the circle"
+        int interactionCnt = 200; // Amount of interactions
+        int experimentCnt = 50; // Amount of experiments
+        int fileSize = 100; // Payload of the file
 
         try {
             switch (args.length) {
@@ -63,6 +63,7 @@ public class Main {
         System.out.println("Experiment Done");
     }
 
+    /** For science! */
     private static void experiment(int experimentCnt, double fileSize,
             int peerCnt, int method, int interactionCnt, int graphDegree, double param) {
         final int trials = 100;
@@ -70,15 +71,22 @@ public class Main {
         double[][] downloadTime = new double[experimentCnt][trials];
         for (int i = 0; i < experimentCnt; i++) {
             System.out.print("Experiment " + (i+1) + " out of " + experimentCnt + " ");
+            // Each experiment (different history size) is conducted 100 times, averages are calculated
             for (int j = 0; j < trials; j++) {
+                // First generate PeerGraph and InteractionGraph
                 PeerGraph pgraph = PeerGraphGenerator.generate(
                         peerCnt, method, graphDegree, param);
                 InteractionGraph igraph = InteractionGraphGenerator.generate(
                         pgraph, interactionCnt);
+                // start timing
                 long start = System.currentTimeMillis();
+                // determine download speed based on trust
                 double speed = calculate(pgraph, igraph, interactionCnt, interactionCnt * i / experimentCnt);
+                // calculate download time based on fileSize and download speed
                 downloadTime[i][j] = fileSize / speed;
+                // end timing
                 calculateTime[i][j] = (System.currentTimeMillis() - start) / 1000.0;
+                // Dots in the terminal indicate the amount of trials done
                 System.out.print(".");
             }
             System.out.println();
@@ -86,6 +94,7 @@ public class Main {
         try (PrintWriter out = new PrintWriter(new File("output.data"))) {
             out.println("type\tsize\ttime\tstd");
             Statistics stat;
+            // Print average and stddev for calculation, download and total times for all experiments
             for (int i = 0; i < experimentCnt; i++) {
                 stat = new Statistics(calculateTime[i]);
                 out.print("calc\t");
@@ -108,22 +117,26 @@ public class Main {
         }
     }
 
+    /** Calculates the maximum possible download speed from Peer 0 to any other Peer */
     private static double calculate(PeerGraph pgraph, InteractionGraph igraph, long currTime, long minTime) {
         double maxSpeed = 0, spd;
         Map<Peer, List<List<Peer>>> allPaths = Util.getAllPaths(pgraph, pgraph.getNodes().get(0), minTime);
         
+        // From all peers for which the trust > 0.9, get max download speed
         for (int i = 1; i < pgraph.getNodes().size(); i++) {
             if (0.9 < Util.calculateTrust(pgraph, pgraph.getNodes().get(0), allPaths.get(pgraph.getNodes().get(i)), currTime)) {
                 spd = pgraph.getNodes().get(i).getUploadSpeed();
                 maxSpeed = spd > maxSpeed ? spd : maxSpeed;
             }
         }
+        // If no one is found, get best download speed from seenPeers
         if (maxSpeed == 0) {
             for (Peer other : pgraph.getNodes().get(0).seenPeers.keySet()) {
                 spd = other.getUploadSpeed();
                 maxSpeed = spd > maxSpeed ? spd : maxSpeed;
             }
         }
+        // If no one is found, get a random peer from somewhere
         if (maxSpeed == 0) {
             maxSpeed = pgraph.getNodes().get(new Random().nextInt(pgraph.getNodes().size())).getUploadSpeed();
         }
@@ -132,7 +145,7 @@ public class Main {
     }
 
 
-
+    /** Generates only one time a peer and a interaction graph and outputs .gv files and stuff */
     private static void generate(int peerCnt, int method, int interactionCnt, int graphDegree, double param, boolean print) {
         PeerGraph pgraph = PeerGraphGenerator.generate(
                 peerCnt, method, graphDegree, param);

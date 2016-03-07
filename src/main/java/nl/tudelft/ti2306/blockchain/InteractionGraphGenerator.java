@@ -35,6 +35,7 @@ public class InteractionGraphGenerator {
         return res;
     }
 
+    /** Get a peer-id to connect to based on the BitTorrent protocol */
     private static int getPeerBittorrent(PeerGraph pgraph, int peer1) {
         // Choose one of the four peers with maximum speeds
         if (random.nextDouble() < 0.8) {
@@ -44,11 +45,13 @@ public class InteractionGraphGenerator {
         }
     }
     
+    /** Calculate for each peer which four peers are the fastest neighbours */
     private static void initMaxSpeeds(PeerGraph pgraph) {
         for (int p1 = 0; p1 < pgraph.getNodes().size(); p1++) {
             List<Integer> edges = pgraph.getEdges(p1);
             Set<Integer> set = new HashSet<>();
             set.addAll(edges);
+            // While there are >4 neighbours, kick out the one with lowest speed
             while (set.size() > 4) {
                 Integer min = -1;
                 for (Integer i : set) {
