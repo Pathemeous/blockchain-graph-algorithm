@@ -29,7 +29,7 @@ public class Main {
         int graphDegree = 2;
         int method = PeerGraphGenerator.SCALE_FREE;
         double param = 0.1;
-        int interactionCnt = 100;
+        int interactionCnt = 200;
         int experimentCnt = 50;
         int fileSize = 100;
 
@@ -65,7 +65,7 @@ public class Main {
 
     private static void experiment(int experimentCnt, double fileSize,
             int peerCnt, int method, int interactionCnt, int graphDegree, double param) {
-        final int trials = 10;
+        final int trials = 100;
         double[][] calculateTime = new double[experimentCnt][trials];
         double[][] downloadTime = new double[experimentCnt][trials];
         for (int i = 0; i < experimentCnt; i++) {
