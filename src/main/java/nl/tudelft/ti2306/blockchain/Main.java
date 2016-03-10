@@ -82,10 +82,10 @@ public class Main {
                 long start = System.currentTimeMillis();
                 // determine download speed based on trust
                 double speed = calculate(pgraph, igraph, interactionCnt, interactionCnt * i / experimentCnt);
+                // end timing and save it.
+                calculateTime[i][j] = (System.currentTimeMillis() - start) / 1000.0;
                 // calculate download time based on fileSize and download speed
                 downloadTime[i][j] = fileSize / speed;
-                // end timing
-                calculateTime[i][j] = (System.currentTimeMillis() - start) / 1000.0;
                 // Dots in the terminal indicate the amount of trials done
                 System.out.print(".");
             }
