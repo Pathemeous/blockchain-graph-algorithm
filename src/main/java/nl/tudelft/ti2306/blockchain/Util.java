@@ -1,6 +1,7 @@
 package nl.tudelft.ti2306.blockchain;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -156,6 +157,39 @@ public class Util {
             failChance *= 1.0 - pathSucceed;
         }
         return 1.0 - failChance;
+    }
+    
+    public static double[][] getNewAllTrusts(PeerGraph pgraph, long currTime, long minTime) {
+        int n = pgraph.getNodes().size();
+        double[][] res = new double[n][n];
+        Interaction last;
+        for (int i = 0; i < n; i++) {
+            res[i][i] = 1;
+            for (int j : pgraph.getEdges(i)) {
+                last = pgraph.getNodes().get(i).getPrevious(pgraph.getNodes().get(j));
+                if (last != null) {
+                    if (last.getTimestamp() < minTime)
+                        continue;
+                    res[i][j] = 1.0 - (currTime - last.getTimestamp()) / 100.0;  // the weight of the edge (i,j)
+                }
+            }
+        }
+        for (int k = 0; k < n; k++) {
+            for (int i = 0; i < n; i++) {
+                for (int j = 0; j < n; j++) {
+                    if (res[i][j] < res[i][k] * res[k][j]) {
+                        res[i][j] = res[i][k] * res[k][j];
+                    }
+                }
+            }
+        }
+        return res;
+    }
+    public static double getNewTrust(double[][] trusts, int peer1, int peer2) {
+        return trusts[peer1][peer2];
+    }
+    public static double getNewTrust(PeerGraph pgraph, int peer1, int peer2, long currTime, long minTime) {
+        return getNewTrust(getNewAllTrusts(pgraph, currTime, minTime), peer1, peer2);
     }
 
     /**

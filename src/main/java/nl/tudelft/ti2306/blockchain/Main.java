@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -25,12 +26,12 @@ public class Main {
      */
     public static void main(String ... args) {
 
-        int peerCnt = 30; // Amount of peers
-        int graphDegree = 2; // Average graph degree of peer-graph
+        int peerCnt = 200; // Amount of peers
+        int graphDegree = 10; // Average graph degree of peer-graph
         int method = PeerGraphGenerator.SCALE_FREE; // Method of generating peer-graph
         double param = 0.1; // For SMALL_WORLD: chance of an edge "crossing the circle"
-        int interactionCnt = 200; // Amount of interactions
-        int experimentCnt = 50; // Amount of experiments
+        int interactionCnt = 1000; // Amount of interactions
+        int experimentCnt = 100; // Amount of experiments
         int fileSize = 100; // Payload of the file
 
         try {
@@ -69,8 +70,11 @@ public class Main {
         final int trials = 100;
         double[][] calculateTime = new double[experimentCnt][trials];
         double[][] downloadTime = new double[experimentCnt][trials];
-        for (int i = 0; i < experimentCnt; i++) {
-            System.out.print("Experiment " + (i+1) + " out of " + experimentCnt + " ");
+        for (int i = -2; i < experimentCnt; i++) {
+            if (i == -2)
+                System.out.print("Warming up ");
+            else if (i >= 0)
+                System.out.print("Experiment " + (i+1) + " out of " + experimentCnt + " ");
             // Each experiment (different history size) is conducted 100 times, averages are calculated
             for (int j = 0; j < trials; j++) {
                 // First generate PeerGraph and InteractionGraph
@@ -83,9 +87,9 @@ public class Main {
                 // determine download speed based on trust
                 double speed = calculate(pgraph, igraph, interactionCnt, interactionCnt * i / experimentCnt);
                 // end timing and save it.
-                calculateTime[i][j] = (System.currentTimeMillis() - start) / 1000.0;
+                if (i >= 0) calculateTime[i][j] = (System.currentTimeMillis() - start) / 1000.0;
                 // calculate download time based on fileSize and download speed
-                downloadTime[i][j] = fileSize / speed;
+                if (i >= 0) downloadTime[i][j] = fileSize / speed;
                 // Dots in the terminal indicate the amount of trials done
                 System.out.print(".");
             }
@@ -120,15 +124,23 @@ public class Main {
     /** Calculates the maximum possible download speed from Peer 0 to any other Peer */
     private static double calculate(PeerGraph pgraph, InteractionGraph igraph, long currTime, long minTime) {
         double maxSpeed = 0, spd;
-        Map<Peer, List<List<Peer>>> allPaths = Util.getAllPaths(pgraph, pgraph.getNodes().get(0), minTime);
-        
-        // From all peers for which the trust > 0.9, get max download speed
+
+        double[][] trusts = Util.getNewAllTrusts(pgraph, igraph.getNodes().size(), minTime);
         for (int i = 1; i < pgraph.getNodes().size(); i++) {
-            if (0.9 < Util.calculateTrust(pgraph, pgraph.getNodes().get(0), allPaths.get(pgraph.getNodes().get(i)), currTime)) {
+            if (Util.getNewTrust(trusts, 0, i) > 0.9) {
                 spd = pgraph.getNodes().get(i).getUploadSpeed();
                 maxSpeed = spd > maxSpeed ? spd : maxSpeed;
             }
         }
+//        Map<Peer, List<List<Peer>>> allPaths = Util.getAllPaths(pgraph, pgraph.getNodes().get(0), minTime);
+//        
+//        // From all peers for which the trust > 0.9, get max download speed
+//        for (int i = 1; i < pgraph.getNodes().size(); i++) {
+//            if (0.9 < Util.calculateTrust(pgraph, pgraph.getNodes().get(0), allPaths.get(pgraph.getNodes().get(i)), currTime)) {
+//                spd = pgraph.getNodes().get(i).getUploadSpeed();
+//                maxSpeed = spd > maxSpeed ? spd : maxSpeed;
+//            }
+//        }
         // If no one is found, get best download speed from seenPeers
         if (maxSpeed == 0) {
             for (Peer other : pgraph.getNodes().get(0).seenPeers.keySet()) {
@@ -159,14 +171,21 @@ public class Main {
         System.out.println("Generated graph");
         if (!print) return;
 
-        Map<Peer, List<List<Peer>>> map = Util.getAllPaths(pgraph, pgraph.getNodes().get(0), interactionCnt * 4 / 5);
-        for (Entry<Peer, List<List<Peer>>> e : map.entrySet()) {
-            System.out.printf("======= %d =======\n", e.getKey().getId());
-            for (List<Peer> path : e.getValue()) {
-                System.out.println(path);
-            }
+//        Map<Peer, List<List<Peer>>> map = Util.getAllPaths(pgraph, pgraph.getNodes().get(0), 0);//interactionCnt * 4 / 5);
+//        for (Entry<Peer, List<List<Peer>>> e : map.entrySet()) {
+//            System.out.printf("======= %d =======\n", e.getKey().getId());
+//            for (List<Peer> path : e.getValue()) {
+//                System.out.println(path);
+//            }
+//        }
+//        System.out.println(Util.calculateTrust(pgraph, pgraph.getNodes().get(0), map.get(pgraph.getNodes().get(peerCnt - 1)), interactionCnt));
+
+        double[][] trusts = Util.getNewAllTrusts(pgraph, interactionCnt, 0);
+        for (int i = 0; i < peerCnt; i++) {
+            for (int j = 0; j < peerCnt; j++)
+                System.out.printf("%.6f  ", trusts[i][j]);
+            System.out.println();
         }
-        System.out.println(Util.calculateTrust(pgraph, pgraph.getNodes().get(0), map.get(pgraph.getNodes().get(peerCnt - 1)), interactionCnt));
 
         List<Peer> list = new ArrayList<>(pgraph.getNodes());
         Collections.sort(list, pgraph.new EdgeAmountSorter());
