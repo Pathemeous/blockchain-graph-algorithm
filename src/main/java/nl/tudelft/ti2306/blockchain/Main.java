@@ -27,7 +27,7 @@ public class Main {
     public static void main(String ... args) {
 
         int peerCnt = 200; // Amount of peers
-        int graphDegree = 10; // Average graph degree of peer-graph
+        int graphDegree = 20; // Average graph degree of peer-graph
         int method = PeerGraphGenerator.SCALE_FREE; // Method of generating peer-graph
         double param = 0.1; // For SMALL_WORLD: chance of an edge "crossing the circle"
         int interactionCnt = 1000; // Amount of interactions

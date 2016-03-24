@@ -168,9 +168,9 @@ public class Util {
             for (int j : pgraph.getEdges(i)) {
                 last = pgraph.getNodes().get(i).getPrevious(pgraph.getNodes().get(j));
                 if (last != null) {
-                    if (last.getTimestamp() < minTime)
+                    if (last.getTimestamp() < minTime && last.getTimestamp() != -1)
                         continue;
-                    res[i][j] = 1.0 - (currTime - last.getTimestamp()) / 100.0;  // the weight of the edge (i,j)
+                    res[i][j] = Math.max(0, 1.0 - (currTime - last.getTimestamp()) / 100.0);  // the weight of the edge (i,j)
                 }
             }
         }
